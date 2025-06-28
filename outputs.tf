@@ -1,8 +1,5 @@
 output "ipv4_address" {
-  value =  [
-    for addr in proxmox_virtual_environment_vm.this.ipv4_addresses : addr[0]
-    if addr[0] != "127.0.0.1"
-  ][0]
+  value = local.non_local_ips[0]
 }
 
 output "username" {
@@ -11,5 +8,10 @@ output "username" {
 
 output "allowed_ips" {
   value = var.allowed_ips
+}
+
+locals {
+  all_ips      = flatten(proxmox_virtual_environment_vm.this.ipv4_addresses)
+  non_local_ips = [for ip in local.all_ips : ip if ip != "127.0.0.1"]
 }
 

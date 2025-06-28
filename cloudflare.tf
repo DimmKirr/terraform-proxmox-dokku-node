@@ -1,6 +1,4 @@
-
 resource "cloudflare_ruleset" "allow_only_allowed_ips" {
-  count = var.manage_cloudflare ? 1 : 0
   kind        = "zone"
   name        = "Allow only allowed IPs, block all others"
   phase       = "http_request_firewall_custom"

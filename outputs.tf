@@ -11,7 +11,7 @@ output "allowed_ips" {
 }
 
 locals {
-  all_ips      = flatten(proxmox_virtual_environment_vm.this.ipv4_addresses)
+  all_ips       = flatten(proxmox_virtual_environment_vm.this.ipv4_addresses)
   non_local_ips = [for ip in local.all_ips : ip if ip != "127.0.0.1"]
 }
 

@@ -1,47 +1,61 @@
-variable "name" {}
-variable "root_domain" {}
+variable "name" {
+  description = "Name of the Dokku VM and related resources."
+}
+
+variable "root_domain" {
+  description = "Root domain for DNS records (e.g., example.com)."
+}
+
 variable "target_node" {
-  default = "pve"
+  description = "Proxmox node name where the VM will be created."
+  default     = "pve"
 }
 
 variable "vm_storage" {
-  default = "local-lvm"
+  description = "Proxmox storage backend for the VM disk."
+  default     = "local-lvm"
 }
 
 variable "iso_storage" {
-  default = "local"
+  description = "Proxmox storage backend for ISO/snippet files."
+  default     = "local"
 }
 
 variable "vm_id" {
-  default = null
+  description = "Optional static VM ID. If not set, Proxmox auto-assigns."
+  default     = null
 }
 
 variable "disk_size" {
-  type = number
-  default = "50"
+  description = "VM disk size in GB."
+  type        = number
+  default     = "50"
 }
 
 variable "dokku_version" {
-  type = string
-  default = "0.34.7"
+  description = "Dokku version to install."
+  type        = string
+  default     = "0.34.7"
 }
 
 variable "mac_address" {
-  type = string
+  description = "MAC address for the VM network interface."
+  type        = string
 }
 
 variable "ssh_public_key" {
-  type = string
-  description = "SSH public key contents"
+  description = "SSH public key contents."
+  type        = string
 }
 
 variable "allowed_ips" {
-  type = list(string)
-  default = ["0.0.0.0/0"]
+  description = "List of allowed IPs for Cloudflare rules."
+  type        = list(string)
+  default     = ["0.0.0.0/0"]
 }
 
 variable "manage_cloudflare" {
-  type = bool
-  description = "Enable Cloudflare DNS record management"
-  default = true
+  description = "Enable Cloudflare DNS record management."
+  type        = bool
+  default     = true
 }

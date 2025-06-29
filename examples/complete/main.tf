@@ -1,5 +1,5 @@
 module "dokku_proxmox" {
-  source            = "../../terraform/dokku-proxmox"
+  source            = "DimmKirr/dokku-node/proxmox"
   name              = "dokku-app"
   root_domain       = "example.com"
   target_node       = "pve"

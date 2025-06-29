@@ -7,7 +7,7 @@ resource "proxmox_virtual_environment_vm" "this" {
 
   vm_id = var.vm_id != null ? var.vm_id : null
 
-  # VM Liefecycle Hooks
+  # VM Lifecycle Hooks
   hook_script_file_id = proxmox_virtual_environment_file.dokku_wait_hook.id
 
   initialization {

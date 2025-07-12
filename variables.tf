@@ -59,3 +59,13 @@ variable "manage_cloudflare" {
   type        = bool
   default     = true
 }
+
+variable "image" {
+  type = map(string)
+  default = {
+    file_name = "debian-12-generic-amd64.img"
+    url = "https://cloud.debian.org/images/cloud/bookworm/20250703-2162/debian-12-generic-amd64-20250703-2162.qcow2"
+    checksum_algorithm = "sha512"
+    checksum = "c651c2f3fd1ee342f225724959a86a97ad804027c3f057e03189455d093d07a006390929a22df0f95a5269291badc619964bde8bf9e2a33b6f3a01f492895068"
+  }
+}

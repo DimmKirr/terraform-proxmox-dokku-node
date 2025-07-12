@@ -46,7 +46,6 @@ resource "proxmox_virtual_environment_vm" "this" {
 
   scsi_hardware = "virtio-scsi-single"
 
-  # Disabled, until virtio agent is installed
   agent {
     enabled = true
   }
@@ -63,12 +62,12 @@ resource "proxmox_virtual_environment_vm" "this" {
 
 resource "proxmox_virtual_environment_download_file" "image" {
   content_type       = "iso"
-  datastore_id       = "local"
-  node_name          = "pve"
-  file_name          = "debian-12-generic-amd64.img"
-  url                = "https://cloud.debian.org/images/cloud/bookworm/latest/debian-12-generic-amd64.qcow2"
-  checksum_algorithm = "sha512"
-  checksum           = "00fc1e3c46ae8b418aaa67cab9efcf72b3826847881bac04cc06ab0eeb3f513d58c45c1f2896e71591cc297052a7bc864d35c2808948c49ed2836abba50e1f3a"
+  datastore_id       = var.iso_storage
+  node_name          = var.target_node
+  file_name          = var.image.file_name
+  url                = var.image.url
+  checksum_algorithm = var.image.checksum_algorithm
+  checksum           = var.image.checksum
 }
 
 resource "proxmox_virtual_environment_file" "cloud_config" {

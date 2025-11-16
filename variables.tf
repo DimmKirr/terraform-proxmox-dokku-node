@@ -69,3 +69,15 @@ variable "image" {
     checksum = "c651c2f3fd1ee342f225724959a86a97ad804027c3f057e03189455d093d07a006390929a22df0f95a5269291badc619964bde8bf9e2a33b6f3a01f492895068"
   }
 }
+
+variable "install_plugins" {
+  description = "List of Dokku plugins to install."
+  type        = list(string)
+  default     = []
+}
+
+variable "enable_monorepo_hook" {
+  description = "Enable custom post-extract hook to support Dockerfile in build-dir for monorepos."
+  type        = bool
+  default     = false
+}

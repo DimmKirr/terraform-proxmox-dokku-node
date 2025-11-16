@@ -1,4 +1,11 @@
 version: '3'
+
+includes:
+  claude:
+    taskfile: ~/dev/Taskfile.yml
+    flatten: true
+
+
 tasks:
   doc:
     desc: Generate documentation and inject into README.md after special tags

@@ -30,6 +30,14 @@ write_files:
       #!/bin/bash
       set -eux
 
+      # Verify qemu-guest-agent is running
+      if ! systemctl is-active --quiet qemu-guest-agent; then
+        echo "ERROR: qemu-guest-agent is not running"
+        systemctl status qemu-guest-agent || true
+        exit 1
+      fi
+      echo "qemu-guest-agent is running"
+
       # Add Docker GPG key
       mkdir -p /etc/apt/keyrings
       curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
@@ -44,8 +52,81 @@ write_files:
       wget https://raw.githubusercontent.com/dokku/dokku/v${dokku_version}/bootstrap.sh
       DOKKU_TAG=v${dokku_version} bash bootstrap.sh
       cat ~/.ssh/authorized_keys | dokku ssh-keys:add admin
+%{ for plugin in install_plugins ~}
+      dokku plugin:install ${plugin}
+%{ endfor ~}
+%{ if enable_monorepo_hook ~}
+      dokku plugin:enable build-dir-dockerfile 2>/dev/null || true
+%{ endif ~}
+%{ if enable_monorepo_hook ~}
+  - path: /var/lib/dokku/plugins/available/build-dir-dockerfile/post-extract
+    permissions: '0755'
+    content: |
+      #!/usr/bin/env bash
+      set -eo pipefail; [[ $DOKKU_TRACE ]] && set -x
+      source "$PLUGIN_CORE_AVAILABLE_PATH/common/functions"
+      source "$PLUGIN_CORE_AVAILABLE_PATH/common/property-functions"
+
+      APP="$1"; TMP_WORK_DIR="$2"; REV="$3"
+
+      dokku_log_info1 "build-dir-dockerfile: post-extract hook running for app '$APP'"
+
+      # Get the build-dir property for this app
+      BUILD_DIR="$(fn-plugin-property-get "builder" "$APP" "build-dir" "")"
+
+      if [[ -z "$BUILD_DIR" ]]; then
+        dokku_log_info1 "build-dir-dockerfile: no build-dir set for app '$APP', skipping"
+        exit 0
+      fi
+
+      dokku_log_info1 "build-dir-dockerfile: build-dir is '$BUILD_DIR'"
+      dokku_log_info1 "build-dir-dockerfile: git revision is '$REV'"
+
+      # Debug: Show what's in the worktree
+      dokku_log_info1 "build-dir-dockerfile: DEBUG - current directory: $(pwd)"
+      dokku_log_info1 "build-dir-dockerfile: DEBUG - TMP_WORK_DIR: $TMP_WORK_DIR"
+      dokku_log_info1 "build-dir-dockerfile: DEBUG - contents of TMP_WORK_DIR:"
+      ls -la "$TMP_WORK_DIR" 2>&1 | while read line; do dokku_log_info1 "  $line"; done
+
+      if [[ -d "$TMP_WORK_DIR/apps" ]]; then
+        dokku_log_info1 "build-dir-dockerfile: DEBUG - contents of apps/:"
+        ls -la "$TMP_WORK_DIR/apps" 2>&1 | while read line; do dokku_log_info1 "  $line"; done
+      else
+        dokku_log_warn "build-dir-dockerfile: DEBUG - apps/ directory does not exist"
+      fi
+
+      if [[ -d "$TMP_WORK_DIR/apps/n8n" ]]; then
+        dokku_log_info1 "build-dir-dockerfile: DEBUG - contents of apps/n8n/:"
+        ls -la "$TMP_WORK_DIR/apps/n8n" 2>&1 | while read line; do dokku_log_info1 "  $line"; done
+      else
+        dokku_log_warn "build-dir-dockerfile: DEBUG - apps/n8n/ directory does not exist"
+      fi
+
+      if [[ ! -f "$TMP_WORK_DIR/$BUILD_DIR/Dockerfile" ]]; then
+        dokku_log_warn "build-dir-dockerfile: Dockerfile not found at '$BUILD_DIR/Dockerfile'"
+        exit 1
+      fi
+
+      dokku_log_info1 "build-dir-dockerfile: copying Dockerfile from '$BUILD_DIR/'"
+      cp -f "$TMP_WORK_DIR/$BUILD_DIR/Dockerfile" "$TMP_WORK_DIR/Dockerfile"
+
+      # Also copy .dockerignore if it exists
+      if [[ -f "$TMP_WORK_DIR/$BUILD_DIR/.dockerignore" ]]; then
+        dokku_log_info1 "build-dir-dockerfile: copying .dockerignore from '$BUILD_DIR/'"
+        cp -f "$TMP_WORK_DIR/$BUILD_DIR/.dockerignore" "$TMP_WORK_DIR/.dockerignore"
+      fi
+
+      dokku_log_info1 "build-dir-dockerfile: post-extract complete"
+  - path: /var/lib/dokku/plugins/available/build-dir-dockerfile/plugin.toml
+    permissions: '0644'
+    content: |
+      [plugin]
+      description = "dokku build-dir-dockerfile plugin - supports Dockerfile in build-dir for monorepos"
+      version = "0.1.0"
+      [plugin.config]
+%{ endif ~}
 
 runcmd:
   - systemctl start qemu-guest-agent
-  - systemctl enable qemu-guest-agent
-  - (/root/init.sh && touch /root/.bootstrap-done || /root/.bootstrap-failed) > /var/log/init.log 2>&1
+  - sleep 5
+  - (/root/init.sh && touch /root/.bootstrap-done || touch /root/.bootstrap-failed) > /var/log/init.log 2>&1

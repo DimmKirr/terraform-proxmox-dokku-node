@@ -9,6 +9,6 @@ resource "cloudflare_ruleset" "allow_only_allowed_ips" {
     action      = "block"
     description = "Block when the IP address is not in allowed_ips"
     enabled     = true
-    expression  = "not (ip.src in {${join(",", var.allowed_ips)}})"
+    expression  = "not (ip.src in {${join(" ", var.allowed_ips)}})"
   }]
 }

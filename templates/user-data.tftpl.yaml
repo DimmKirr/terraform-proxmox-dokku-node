@@ -39,11 +39,7 @@ write_files:
     content: |
       #!/bin/bash
       set -eux
-      
-      %{ if length(mounts) > 0 ~}
-      mount -a
-      %{ endif ~}
-      
+
       # Verify qemu-guest-agent is running
       if ! systemctl is-active --quiet qemu-guest-agent; then
         echo "ERROR: qemu-guest-agent is not running"
@@ -68,9 +64,12 @@ write_files:
       cat ~/.ssh/authorized_keys | dokku ssh-keys:add admin
 %{ if length(mounts) > 0 ~}
 
-      # Set ownership of mounted directories to dokku user
+      # Mount NFS/CIFS after Dokku creates its directory structure
+      mount -a
+
+      # Try to set ownership (will fail on NFS, but succeeds on local mounts)
 %{ for mount in mounts ~}
-      chown -R dokku:dokku ${mount.path}
+      chown -R dokku:dokku ${mount.path} || true
 %{ endfor ~}
 %{ endif ~}
 %{ for plugin in install_plugins ~}

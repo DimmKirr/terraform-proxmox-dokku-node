@@ -30,7 +30,7 @@ locals {
     var.manage_cloudflare_tunnel ? cloudflare_zero_trust_tunnel_cloudflared.this[0].name : data.cloudflare_zero_trust_tunnel_cloudflared.this[0].name
   ) : ""
 
-  effective_tunnel_name = var.cloudflare_tunnel_name != "" ? var.cloudflare_tunnel_name : var.name
+  effective_tunnel_name = var.cloudflare_tunnel_name != "" ? var.cloudflare_tunnel_name : "${var.name}.${var.root_domain}"
 }
 
 # Random secret for managed tunnel

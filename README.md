@@ -34,7 +34,29 @@ For a complete example, see [`examples/complete`](./examples/complete/).
 ## Requirements
 - [Terraform](https://www.terraform.io/downloads.html) or [OpenTofu](https://opentofu.org/download/)
 - Proxmox access
-- Cloudflare API token
+- Cloudflare API token with the following permissions:
+
+### Cloudflare API Token Permissions
+
+> **Note:** These permissions are known to work. They can likely be refined to Edit/Read instead of all Edit for tighter security.
+
+**All accounts:**
+- DNS Settings: Edit
+- Cloudflare One Connector: cloudflared: Edit
+- Cloudflare Pages: Edit
+- Transform Rules: Edit
+- Account Rulesets: Edit
+- Cloudflare Tunnel: Edit
+- Rule Policies: Edit
+- Zero Trust: Edit
+- Account Settings: Edit
+
+**All zones:**
+- Zone Settings: Edit
+- SSL and Certificates: Edit
+- Page Rules: Edit
+- Firewall Services: Edit
+- DNS: Edit
 
 ## Getting Started
 1. Clone this repo or use as a module source.

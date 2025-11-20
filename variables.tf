@@ -101,7 +101,7 @@ variable "cloudflare_tunnel_name" {
 }
 
 variable "cloudflare_account_id" {
-  description = "Cloudflare account ID for tunnel management"
+  description = "Cloudflare account ID for tunnel management. Leave empty to auto-detect from API token (works if token has access to only one account)."
   type        = string
   default     = ""
   sensitive   = true

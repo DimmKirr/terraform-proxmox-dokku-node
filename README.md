@@ -41,7 +41,7 @@ module "dokku_node" {
   mounts = [
     {
       device  = "192.168.1.100:/mnt/storage/dokku-data"
-      path    = "/mnt/dokku-data"
+      path    = "/var/lib/dokku/data/storage"
       fstype  = "nfs4"
       options = "rw,hard,intr,_netdev"
     }

@@ -66,6 +66,13 @@ write_files:
       wget https://raw.githubusercontent.com/dokku/dokku/v${dokku_version}/bootstrap.sh
       DOKKU_TAG=v${dokku_version} bash bootstrap.sh
       cat ~/.ssh/authorized_keys | dokku ssh-keys:add admin
+%{ if length(mounts) > 0 ~}
+
+      # Set ownership of mounted directories to dokku user
+%{ for mount in mounts ~}
+      chown -R dokku:dokku ${mount.path}
+%{ endfor ~}
+%{ endif ~}
 %{ for plugin in install_plugins ~}
       dokku plugin:install ${plugin}
 %{ endfor ~}

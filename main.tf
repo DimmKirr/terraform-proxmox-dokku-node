@@ -22,13 +22,13 @@ resource "proxmox_virtual_environment_vm" "this" {
 
   machine = "q35"
   cpu {
-    cores = 2
+    cores = var.cpu_cores
     type  = "host"
   }
 
   memory {
-    dedicated = 2048
-    floating  = 2048 # set equal to dedicated to enable ballooning
+    dedicated = var.memory
+    floating  = var.memory # set equal to dedicated to enable ballooning
   }
 
   operating_system {

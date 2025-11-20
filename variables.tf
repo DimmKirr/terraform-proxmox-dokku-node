@@ -32,6 +32,18 @@ variable "disk_size" {
   default     = "50"
 }
 
+variable "cpu_cores" {
+  description = "Number of CPU cores for the VM."
+  type        = number
+  default     = 2
+}
+
+variable "memory" {
+  description = "VM memory in MB."
+  type        = number
+  default     = 2048
+}
+
 variable "dokku_version" {
   description = "Dokku version to install."
   type        = string

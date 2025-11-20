@@ -58,6 +58,20 @@ write_files:
 %{ if enable_monorepo_hook ~}
       dokku plugin:enable build-dir-dockerfile 2>/dev/null || true
 %{ endif ~}
+%{ if cloudflare_tunnel_enabled ~}
+
+      # Install and configure Cloudflare Tunnel connector
+      echo "Installing cloudflared..."
+      curl -L --output /tmp/cloudflared.deb https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
+      dpkg -i /tmp/cloudflared.deb
+      rm /tmp/cloudflared.deb
+
+      # Install tunnel as a service using the token
+      cloudflared service install ${cloudflare_tunnel_token}
+      systemctl enable cloudflared
+      systemctl start cloudflared
+      echo "Cloudflared installed and started"
+%{ endif ~}
 %{ if enable_monorepo_hook ~}
   - path: /var/lib/dokku/plugins/available/build-dir-dockerfile/post-extract
     permissions: '0755'

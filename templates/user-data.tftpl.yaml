@@ -18,6 +18,10 @@ packages:
   - mc
   - htop
   - qemu-guest-agent
+%{ if length(mounts) > 0 ~}
+  - nfs-common
+  - cifs-utils
+%{ endif ~}
 
 users:
   - name: root

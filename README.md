@@ -27,6 +27,28 @@ module "dokku_node" {
 }
 ```
 
+### With NFS Mount
+
+```hcl
+module "dokku_node" {
+  source           = "dimmkirr/dokku-proxmox/terraform"
+  version          = "~> 0.1"
+  name             = "dokku-app"
+  root_domain      = "example.com"
+  mac_address      = "AA:BB:CC:DD:EE:FF"
+  ssh_public_key   = file("~/.ssh/id_rsa.pub")
+
+  mounts = [
+    {
+      device  = "192.168.1.100:/mnt/storage/dokku-data"
+      path    = "/mnt/dokku-data"
+      fstype  = "nfs4"
+      options = "rw,hard,intr,_netdev"
+    }
+  ]
+}
+```
+
 > **Note:** This module currently provisions only Debian 12 VMs.
 
 For a complete example, see [`examples/complete`](./examples/complete/).

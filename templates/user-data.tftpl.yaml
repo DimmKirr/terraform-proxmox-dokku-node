@@ -2,6 +2,12 @@
 hostname: ${hostname}
 package_update: true
 package_upgrade: true
+%{ if length(mounts) > 0 ~}
+mounts:
+%{ for mount in mounts ~}
+  - [ "${mount.device}", "${mount.path}", "${mount.fstype}", "${mount.options}", "${mount.dump}", "${mount.pass}" ]
+%{ endfor ~}
+%{ endif ~}
 packages:
   - apt-transport-https
   - ca-certificates

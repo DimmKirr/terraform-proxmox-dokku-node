@@ -84,6 +84,7 @@ resource "proxmox_virtual_environment_file" "cloud_config" {
       enable_monorepo_hook      = var.enable_monorepo_hook
       cloudflare_tunnel_enabled = var.cloudflare_tunnel_enabled
       cloudflare_tunnel_token   = var.cloudflare_tunnel_enabled ? data.cloudflare_zero_trust_tunnel_cloudflared_token.this[0].token : ""
+      mounts                    = var.mounts
     })
     file_name = "user-data.${var.name}.yaml"
   }

@@ -106,3 +106,16 @@ variable "cloudflare_account_id" {
   default     = ""
   sensitive   = true
 }
+
+variable "mounts" {
+  description = "List of filesystem mounts to add to /etc/fstab. Each mount requires device, path, fstype, and options. Dump and pass are optional (default to 0)."
+  type = list(object({
+    device  = string
+    path    = string
+    fstype  = string
+    options = string
+    dump    = optional(string, "0")
+    pass    = optional(string, "0")
+  }))
+  default = []
+}

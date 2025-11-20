@@ -39,7 +39,11 @@ write_files:
     content: |
       #!/bin/bash
       set -eux
-
+      
+      %{ if length(mounts) > 0 ~}
+      mount -a
+      %{ endif ~}
+      
       # Verify qemu-guest-agent is running
       if ! systemctl is-active --quiet qemu-guest-agent; then
         echo "ERROR: qemu-guest-agent is not running"

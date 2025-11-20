@@ -77,11 +77,14 @@ resource "proxmox_virtual_environment_file" "cloud_config" {
 
   source_raw {
     data = templatefile("${path.module}/templates/user-data.tftpl.yaml", {
-      hostname             = var.name
-      ssh_public_key       = var.ssh_public_key
-      dokku_version        = var.dokku_version
-      install_plugins      = var.install_plugins
-      enable_monorepo_hook = var.enable_monorepo_hook
+      hostname                  = var.name
+      ssh_public_key            = var.ssh_public_key
+      dokku_version             = var.dokku_version
+      install_plugins           = var.install_plugins
+      enable_monorepo_hook      = var.enable_monorepo_hook
+      cloudflare_tunnel_enabled = var.cloudflare_tunnel_enabled
+      cloudflare_tunnel_token   = var.cloudflare_tunnel_enabled ? data.cloudflare_zero_trust_tunnel_cloudflared_token.this[0].token : ""
+      mounts                    = var.mounts
     })
     file_name = "user-data.${var.name}.yaml"
   }

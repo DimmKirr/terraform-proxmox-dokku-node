@@ -2,6 +2,12 @@
 hostname: ${hostname}
 package_update: true
 package_upgrade: true
+%{ if length(mounts) > 0 ~}
+mounts:
+%{ for mount in mounts ~}
+  - [ "${mount.device}", "${mount.path}", "${mount.fstype}", "${mount.options}", "${mount.dump}", "${mount.pass}" ]
+%{ endfor ~}
+%{ endif ~}
 packages:
   - apt-transport-https
   - ca-certificates
@@ -12,6 +18,10 @@ packages:
   - mc
   - htop
   - qemu-guest-agent
+%{ if length(mounts) > 0 ~}
+  - nfs-common
+  - cifs-utils
+%{ endif ~}
 
 users:
   - name: root
@@ -57,6 +67,20 @@ write_files:
 %{ endfor ~}
 %{ if enable_monorepo_hook ~}
       dokku plugin:enable build-dir-dockerfile 2>/dev/null || true
+%{ endif ~}
+%{ if cloudflare_tunnel_enabled ~}
+
+      # Install and configure Cloudflare Tunnel connector
+      echo "Installing cloudflared..."
+      curl -L --output /tmp/cloudflared.deb https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
+      dpkg -i /tmp/cloudflared.deb
+      rm /tmp/cloudflared.deb
+
+      # Install tunnel as a service using the token
+      cloudflared service install ${cloudflare_tunnel_token}
+      systemctl enable cloudflared
+      systemctl start cloudflared
+      echo "Cloudflared installed and started"
 %{ endif ~}
 %{ if enable_monorepo_hook ~}
   - path: /var/lib/dokku/plugins/available/build-dir-dockerfile/post-extract
